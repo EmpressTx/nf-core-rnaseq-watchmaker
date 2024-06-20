@@ -440,7 +440,7 @@ workflow RNASEQ {
             ch_samtools_stats    = BAM_DEDUP_STATS_SAMTOOLS_UMITOOLS_GENOME.out.stats
             ch_samtools_flagstat = BAM_DEDUP_STATS_SAMTOOLS_UMITOOLS_GENOME.out.flagstat
             ch_samtools_idxstats = BAM_DEDUP_STATS_SAMTOOLS_UMITOOLS_GENOME.out.idxstats
-            ch_umidedup_multiqc = BAM_DEDUP_STATS_SAMTOOLS_UMITOOLS_GENOME.out.log
+            ch_umidedup_multiqc = BAM_DEDUP_STATS_SAMTOOLS_UMITOOLS_GENOME.out.deduplog
             if (params.bam_csi_index) {
                 ch_genome_bam_index  = BAM_DEDUP_STATS_SAMTOOLS_UMITOOLS_GENOME.out.csi
             }
@@ -588,7 +588,7 @@ workflow RNASEQ {
             ch_samtools_stats    = BAM_DEDUP_STATS_SAMTOOLS_UMITOOLS_GENOME.out.stats
             ch_samtools_flagstat = BAM_DEDUP_STATS_SAMTOOLS_UMITOOLS_GENOME.out.flagstat
             ch_samtools_idxstats = BAM_DEDUP_STATS_SAMTOOLS_UMITOOLS_GENOME.out.idxstats
-            ch_umidedup_multiqc = BAM_DEDUP_STATS_SAMTOOLS_UMITOOLS_GENOME.out.log
+            ch_umidedup_multiqc = BAM_DEDUP_STATS_SAMTOOLS_UMITOOLS_GENOME.out.deduplog
             
             if (params.bam_csi_index) {
                 ch_genome_bam_index = BAM_DEDUP_STATS_SAMTOOLS_UMITOOLS_GENOME.out.csi
