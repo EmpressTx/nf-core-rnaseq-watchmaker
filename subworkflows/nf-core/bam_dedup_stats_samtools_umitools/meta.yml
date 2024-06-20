@@ -29,6 +29,10 @@ output:
       description: |
         Umi deduplicated BAM/SAM file
         Structure: [ val(meta), path(bam) ]
+  - log:
+      description: |
+        Umi deduplicated BAM/SAM log file
+        Structure: [ val(meta), path(log) ]
   - bai:
       description: |
         Umi deduplicated BAM/SAM samtools index
