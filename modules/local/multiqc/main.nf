@@ -44,7 +44,7 @@ process MULTIQC {
     path ('rseqc/read_distribution/*')
     path ('rseqc/read_duplication/*')
     path ('rseqc/tin/*')
-    path ('umitools/*')
+    path ('umi_tools/*'), stageAs: "?/*"
 
     output:
     path "*multiqc_report.html", emit: report
