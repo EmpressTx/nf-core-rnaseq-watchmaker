@@ -87,9 +87,9 @@ sp:
   sortmerna:
     fn: "*.sortmerna.log"
 
-  fastqc/raw/*:
+  fastqc/raw:
     fn: "*fastqc.zip"
-  fastqc/trim/*:
+  fastqc/trim:
     fn: "*fastqc.zip"
 
   hisat2:
