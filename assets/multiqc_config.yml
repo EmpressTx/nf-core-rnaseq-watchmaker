@@ -92,6 +92,11 @@ sp:
   fastqc/trim:
     fn: "*fastqc.zip"
 
+  fastqc/data:
+    fn: "fastqc_data.txt"
+  fastqc/zip:
+    fn: "*_fastqc.zip"
+
   hisat2:
     fn: "*.hisat2.summary.log"
 
