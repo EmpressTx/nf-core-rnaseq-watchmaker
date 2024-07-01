@@ -35,7 +35,6 @@ process MULTIQC {
     path ('deseq2/pseudoaligner/*')
     path ('preseq/*')
     path ('qualimap/*')
-    path ('dupradar/*')
     path ('rseqc/bam_stat/*')
     path ('rseqc/infer_experiment/*')
     path ('rseqc/inner_distance/*')
