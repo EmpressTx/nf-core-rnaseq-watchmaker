@@ -49,14 +49,14 @@ module_order:
       name: "FastQC (raw)"
       info: "This section of the report shows FastQC results before adapter trimming."
       path_filters:
-        - "./fastqc/raw/*.zip"
+        - "**/raw/*.zip"
   - cutadapt
   - fastp
   - fastqc:
       name: "FastQC (trimmed)"
       info: "This section of the report shows FastQC results after adapter trimming."
       path_filters:
-        - "./fastqc/trim/*.zip"
+        - "**/trim/*.zip"
   - umitools:
       name: "UMI Tools Dedup"
       umitools_extract : remove
