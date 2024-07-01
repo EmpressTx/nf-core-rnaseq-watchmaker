@@ -904,7 +904,6 @@ workflow RNASEQ {
             ch_pseudoaligner_clustering_multiqc.collect().ifEmpty([]),
             ch_preseq_multiqc.collect{it[1]}.ifEmpty([]),
             ch_qualimap_multiqc.collect{it[1]}.ifEmpty([]),
-            ch_dupradar_multiqc.collect{it[1]}.ifEmpty([]),
             ch_bamstat_multiqc.collect{it[1]}.ifEmpty([]),
             ch_inferexperiment_multiqc.collect{it[1]}.ifEmpty([]),
             ch_innerdistance_multiqc.collect{it[1]}.ifEmpty([]),
