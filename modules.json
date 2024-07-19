@@ -254,7 +254,7 @@
                 "nf-core": {
                     "bam_dedup_stats_samtools_umitools": {
                         "branch": "master",
-                        "git_sha": "26dc961792045cfec1b6809d79c4efecf2c188db",
+                        "git_sha": "dedc0e31087f3306101c38835d051bf49789445a",
                         "installed_by": ["subworkflows"]
                     },
                     "bam_markduplicates_picard": {
@@ -274,7 +274,7 @@
                     },
                     "bam_stats_samtools": {
                         "branch": "master",
-                        "git_sha": "26dc961792045cfec1b6809d79c4efecf2c188db",
+                        "git_sha": "dedc0e31087f3306101c38835d051bf49789445a",
                         "installed_by": [
                             "bam_sort_stats_samtools",
                             "bam_markduplicates_picard",
