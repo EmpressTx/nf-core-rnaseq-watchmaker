@@ -912,7 +912,7 @@ workflow RNASEQ {
             ch_readdistribution_multiqc.collect{it[1]}.ifEmpty([]),
             ch_readduplication_multiqc.collect{it[1]}.ifEmpty([]),
             ch_tin_multiqc.collect{it[1]}.ifEmpty([])
-            //ch_umidedup_multiqc.collect{it[1]}.ifEmpty([])
+            ch_umidedup_multiqc.collect{it[1]}.ifEmpty([])
         )
         multiqc_report = MULTIQC.out.report.toList()
     }
