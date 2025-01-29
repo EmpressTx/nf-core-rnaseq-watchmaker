@@ -481,7 +481,7 @@ workflow RNASEQ {
             // Fix paired-end reads in name sorted BAM file
             // See: https://github.com/nf-core/rnaseq/issues/828
             UMITOOLS_PREPAREFORSALMON (
-                ch_umitools_dedup_bam.paired_end
+                ch_umitools_dedup_bam.paired_end.map { meta, bam -> [ meta, bam, [] ] }
             )
             ch_versions = ch_versions.mix(UMITOOLS_PREPAREFORSALMON.out.versions.first())
 
