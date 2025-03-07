@@ -429,6 +429,7 @@ workflow RNASEQ {
         //
         // SUBWORKFLOW: Remove duplicate reads from BAM file based on UMIs
         //
+        ch_umidedup_multiqc = Channel.empty()
         if (params.with_umi) {
             // Deduplicate genome BAM file before downstream analysis
             BAM_DEDUP_STATS_SAMTOOLS_UMITOOLS_GENOME (
@@ -578,7 +579,7 @@ workflow RNASEQ {
         //
         // SUBWORKFLOW: Remove duplicate reads from BAM file based on UMIs
         //
-        ch_umidedup_multiqc = Channel.empty()
+        
         if (params.with_umi) {
             BAM_DEDUP_STATS_SAMTOOLS_UMITOOLS_GENOME (
                 ch_genome_bam.join(ch_genome_bam_index, by: [0]),
