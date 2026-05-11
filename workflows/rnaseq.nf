@@ -112,6 +112,7 @@ include { DUPRADAR                           } from '../modules/local/dupradar'
 include { MULTIQC                            } from '../modules/local/multiqc'
 include { MULTIQC_CUSTOM_BIOTYPE             } from '../modules/local/multiqc_custom_biotype'
 include { UMITOOLS_PREPAREFORRSEM as UMITOOLS_PREPAREFORSALMON } from '../modules/local/umitools_prepareforrsem'
+include { COUNT_READS                        } from '../modules/local/count_reads'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -140,6 +141,7 @@ include { SORTMERNA                   } from '../modules/nf-core/sortmerna'
 include { STRINGTIE_STRINGTIE         } from '../modules/nf-core/stringtie/stringtie'
 include { SUBREAD_FEATURECOUNTS       } from '../modules/nf-core/subread/featurecounts'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoftwareversions'
+include { SEQTK_SAMPLE                } from '../modules/nf-core/seqtk/sample'
 
 //
 // SUBWORKFLOW: Consisting entirely of nf-core/modules
@@ -347,7 +349,32 @@ workflow RNASEQ {
         ch_sortmerna_multiqc = SORTMERNA.out.log
         ch_versions = ch_versions.mix(SORTMERNA.out.versions.first())
     }
-    
+
+    //
+    // MODULE: Sub-sample reads if total read count exceeds threshold
+    //
+    if (!params.skip_subsample) {
+        COUNT_READS ( ch_filtered_reads )
+
+        COUNT_READS.out.reads_with_count
+            .branch {
+                meta, reads, num_reads ->
+                    subsample: num_reads.toLong() > params.subsample_reads_threshold
+                        return [ meta, reads, params.subsample_reads_threshold ]
+                    passthrough: true
+                        return [ meta, reads ]
+            }
+            .set { ch_reads_to_subsample }
+
+        SEQTK_SAMPLE ( ch_reads_to_subsample.subsample )
+        ch_versions = ch_versions.mix(SEQTK_SAMPLE.out.versions.first())
+
+        // Mix subsampled reads with those that did not need subsampling
+        SEQTK_SAMPLE.out.reads
+            .mix(ch_reads_to_subsample.passthrough)
+            .set { ch_filtered_reads }
+    }
+
     //
     // SUBWORKFLOW: Sub-sample FastQ files and pseudoalign with Salmon to auto-infer strandedness
     //
