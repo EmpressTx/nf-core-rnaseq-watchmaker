@@ -1,31 +1,48 @@
 {
-    "homo_sapiens genome_fasta": {
+    "sarscov2 transcriptome.fasta - stub": {
         "content": [
+            [
+                [
+                    {
+                        "id": "transcriptome"
+                    },
+                    [
+                        
+                    ]
+                ]
+            ],
             {
-                "0": [
+                "versions_kallisto": [
                     [
-                        {
-                            "id": "test_fasta"
-                        },
-                        "kallisto:md5,2dab84e1456201beca5a43f4c514d67c"
+                        "KALLISTO_INDEX",
+                        "kallisto",
+                        "0.51.1"
                     ]
-                ],
-                "1": [
-                    "versions.yml:md5,178f9b57d4228edc356911d571b958a4"
-                ],
-                "index": [
-                    [
-                        {
-                            "id": "test_fasta"
-                        },
-                        "kallisto:md5,2dab84e1456201beca5a43f4c514d67c"
-                    ]
-                ],
-                "versions": [
-                    "versions.yml:md5,178f9b57d4228edc356911d571b958a4"
                 ]
             }
         ],
-        "timestamp": "2023-11-02T09:58:48.83625986"
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.10.2"
+        },
+        "timestamp": "2026-01-28T17:53:06.991465"
+    },
+    "sarscov2 transcriptome.fasta": {
+        "content": [
+            {
+                "versions_kallisto": [
+                    [
+                        "KALLISTO_INDEX",
+                        "kallisto",
+                        "0.51.1"
+                    ]
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.10.2"
+        },
+        "timestamp": "2026-01-28T17:52:50.923273"
     }
 }

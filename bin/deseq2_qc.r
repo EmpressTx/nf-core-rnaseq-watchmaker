@@ -55,7 +55,7 @@ if (is.null(opt$count_file)){
 ################################################
 ################################################
 
-count.table           <- read.delim(file=opt$count_file,header=TRUE, row.names=NULL)
+count.table           <- read.delim(file=opt$count_file,header=TRUE, row.names=NULL, check.names=FALSE)
 rownames(count.table) <- count.table[,opt$id_col]
 count.table           <- count.table[,opt$count_col:ncol(count.table),drop=FALSE]
 colnames(count.table) <- gsub(opt$sample_suffix,"",colnames(count.table))
@@ -76,7 +76,7 @@ samples.vec     <- colnames(count.table)
 name_components <- strsplit(samples.vec, "_")
 n_components    <- length(name_components[[1]])
 decompose       <- n_components!=1 && all(sapply(name_components, length)==n_components)
-coldata         <- data.frame(samples.vec, sample=samples.vec, row.names=1)
+coldata         <- data.frame(sample=samples.vec, row.names=samples.vec)
 if (decompose) {
     groupings        <- as.data.frame(lapply(1:n_components, function(i) sapply(name_components, "[[", i)))
     n_distinct       <- sapply(groupings, function(grp) length(unique(grp)))
@@ -92,7 +92,8 @@ if (decompose) {
 DDSFile <- paste(opt$outprefix,".dds.RData",sep="")
 
 counts  <- count.table[,samples.vec,drop=FALSE]
-dds     <- DESeqDataSetFromMatrix(countData=round(counts), colData=coldata, design=~ 1)
+# `design=~1` creates intercept-only model, equivalent to setting `blind=TRUE` for transformation.
+dds     <- DESeqDataSetFromMatrix(countData=round(counts), colData=coldata, design=~1)
 dds     <- estimateSizeFactors(dds)
 if (min(dim(count.table))<=1)  { # No point if only one sample, or one gene
     save(dds,file=DDSFile)

@@ -2,11 +2,10 @@ process UCSC_BEDGRAPHTOBIGWIG {
     tag "$meta.id"
     label 'process_single'
 
-    // WARN: Version information not provided by tool on CLI. Please update version string below when bumping container versions.
-    conda "bioconda::ucsc-bedgraphtobigwig=445"
+    conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/ucsc-bedgraphtobigwig:445--h954228d_0' :
-        'biocontainers/ucsc-bedgraphtobigwig:445--h954228d_0' }"
+        'https://depot.galaxyproject.org/singularity/ucsc-bedgraphtobigwig:469--h9b8f530_0' :
+        'biocontainers/ucsc-bedgraphtobigwig:469--h9b8f530_0' }"
 
     input:
     tuple val(meta), path(bedgraph)
@@ -14,7 +13,7 @@ process UCSC_BEDGRAPHTOBIGWIG {
 
     output:
     tuple val(meta), path("*.bigWig"), emit: bigwig
-    path "versions.yml"              , emit: versions
+    tuple val("${task.process}"), val('ucsc'), eval("echo $VERSION"), topic: versions, emit: versions_ucsc
 
     when:
     task.ext.when == null || task.ext.when
@@ -22,28 +21,19 @@ process UCSC_BEDGRAPHTOBIGWIG {
     script:
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
-    def VERSION = '445' // WARN: Version information not provided by tool on CLI. Please update this string when bumping container versions.
+    VERSION = '469' // WARN: Version information not provided by tool on CLI. Please update this string when bumping container versions.
     """
     bedGraphToBigWig \\
+        $args \\
         $bedgraph \\
         $sizes \\
         ${prefix}.bigWig
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        ucsc: $VERSION
-    END_VERSIONS
     """
 
     stub:
     def prefix = task.ext.prefix ?: "${meta.id}"
-    def VERSION = '445' // WARN: Version information not provided by tool on CLI. Please update this string when bumping container versions.
+    VERSION = '469' // WARN: Version information not provided by tool on CLI. Please update this string when bumping container versions.
     """
     touch ${prefix}.bigWig
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        ucsc: $VERSION
-    END_VERSIONS
     """
 }

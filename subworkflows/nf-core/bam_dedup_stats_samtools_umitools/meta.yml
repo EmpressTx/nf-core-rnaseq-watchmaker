@@ -11,6 +11,7 @@ keywords:
 components:
   - umitools/dedup
   - samtools/index
+  - samtools/view
   - samtools/stats
   - samtools/idxstats
   - samtools/flagstat
@@ -24,6 +25,12 @@ input:
       type: boolean
       description: |
         Generate output stats when running "umi_tools dedup"
+  - val_primary_only:
+      type: boolean
+      description: |
+        Filter to primary alignments (SAM flag 0x900) before running UMI-tools dedup.
+        When true, secondary and supplementary alignments are removed so that dedup
+        statistics reflect only primary alignments.
 output:
   - bam:
       description: |
@@ -41,6 +48,10 @@ output:
       description: |
         CSI samtools index
         Structure: [ val(meta), path(csi) ]
+  - deduplog:
+      description: |
+        UMI-tools deduplication log
+        Structure: [ val(meta), path(log) ]
   - stats:
       description: |
         File containing samtools stats output
@@ -57,7 +68,9 @@ output:
       description: |
         Files containing software versions
         Structure: [ path(versions.yml) ]
-
 authors:
+  - "@drpatelh"
+  - "@KamilMaliszArdigen"
+maintainers:
   - "@drpatelh"
   - "@KamilMaliszArdigen"
