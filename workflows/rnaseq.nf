@@ -140,6 +140,7 @@ include { SORTMERNA                   } from '../modules/nf-core/sortmerna'
 include { STRINGTIE_STRINGTIE         } from '../modules/nf-core/stringtie/stringtie'
 include { SUBREAD_FEATURECOUNTS       } from '../modules/nf-core/subread/featurecounts'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoftwareversions'
+include { SEQTK_SAMPLE                } from '../modules/nf-core/seqtk/sample'
 
 //
 // SUBWORKFLOW: Consisting entirely of nf-core/modules
@@ -313,6 +314,33 @@ workflow RNASEQ {
                 WorkflowRnaseq.multiqcTsvFromList(tsv_data, header)
         }
         .set { ch_fail_trimming_multiqc }
+
+    //
+    // MODULE: Sub-sample reads if total read count exceeds threshold
+    //
+    if (!params.skip_subsample) {
+        // Use the trim_read_count channel (emitted by both TrimGalore and fastp
+        // subworkflows) to decide which samples need sub-sampling.
+        // Join the read count back to the reads channel so we can branch.
+        ch_filtered_reads
+            .join(ch_trim_read_count)
+            .branch {
+                meta, reads, num_reads ->
+                    subsample: num_reads.toLong() > params.subsample_reads_threshold
+                        return [ meta, reads, params.subsample_reads_threshold ]
+                    passthrough: true
+                        return [ meta, reads ]
+            }
+            .set { ch_reads_to_subsample }
+
+        SEQTK_SAMPLE ( ch_reads_to_subsample.subsample )
+        ch_versions = ch_versions.mix(SEQTK_SAMPLE.out.versions.first())
+
+        // Mix subsampled reads with those that did not need subsampling
+        SEQTK_SAMPLE.out.reads
+            .mix(ch_reads_to_subsample.passthrough)
+            .set { ch_filtered_reads }
+    }
 
     //
     // MODULE: Remove genome contaminant reads
