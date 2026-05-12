@@ -322,12 +322,15 @@ workflow RNASEQ {
         // Use the trim_read_count channel (emitted by both TrimGalore and fastp
         // subworkflows) to decide which samples need sub-sampling.
         // Join the read count back to the reads channel so we can branch.
+        // IMPORTANT: Pass a fractional sample_size (threshold / read_count) so
+        // that seqtk uses streaming mode and does NOT load all reads into memory.
         ch_filtered_reads
             .join(ch_trim_read_count)
             .branch {
                 meta, reads, num_reads ->
                     subsample: num_reads.toLong() > params.subsample_reads_threshold
-                        return [ meta, reads, params.subsample_reads_threshold ]
+                        def fraction = params.subsample_reads_threshold / num_reads.toDouble()
+                        return [ meta, reads, fraction ]
                     passthrough: true
                         return [ meta, reads ]
             }
