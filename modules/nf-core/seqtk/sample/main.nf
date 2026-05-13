@@ -11,7 +11,7 @@ process SEQTK_SAMPLE {
     tuple val(meta), path(reads), val(sample_size)
 
     output:
-    tuple val(meta), path("*.fastq.gz"), emit: reads
+    tuple val(meta), path("*.f{ast,}q.gz"), emit: reads
     path  "versions.yml"               , emit: versions
 
     when:
