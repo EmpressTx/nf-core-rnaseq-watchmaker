@@ -1,0 +1,40 @@
+name: seqtk_sample
+description: Subsample reads from FASTQ files
+keywords:
+  - sample
+  - fastx
+  - reads
+tools:
+  - seqtk:
+      description: Toolkit for processing sequences in FASTA/Q formats
+      homepage: https://github.com/lh3/seqtk
+      documentation: https://docs.csc.fi/apps/seqtk/
+      tool_dev_url: https://github.com/lh3/seqtk
+      licence: ["MIT"]
+input:
+  - meta:
+      type: map
+      description: Groovy Map containing sample information e.g. [ id:'test', single_end:false ]
+  - reads:
+      type: file
+      description: List of input FastQ files
+      pattern: "*.{fastq.gz}"
+  - sample_size:
+      type: float
+      description: Fraction (<1.0) or number (>=1) of reads to sample
+output:
+  - meta:
+      type: map
+      description: Groovy Map containing sample information e.g. [ id:'test', single_end:false ]
+  - reads:
+      type: file
+      description: Subsampled FastQ files
+      pattern: "*.{fastq.gz}"
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"
+authors:
+  - "@kaurravneet4123"
+  - "@sidorov-si"
+  - "@adamrtalbot"
