@@ -132,6 +132,7 @@ include { QUANTIFY_PSEUDO_ALIGNMENT                         } from '../subworkfl
 // MODULE: Installed directly from nf-core/modules
 //
 include { CAT_FASTQ                   } from '../modules/nf-core/cat/fastq'
+include { SEQKIT_STATS                } from '../modules/nf-core/seqkit/stats'
 include { BBMAP_BBSPLIT               } from '../modules/nf-core/bbmap/bbsplit'
 include { SAMTOOLS_SORT               } from '../modules/nf-core/samtools/sort'
 include { PRESEQ_LCEXTRAP             } from '../modules/nf-core/preseq/lcextrap'
@@ -246,6 +247,46 @@ workflow RNASEQ {
     ch_versions = ch_versions.mix(CAT_FASTQ.out.versions.first().ifEmpty(null))
 
     //
+    // MODULE: Count raw reads with SEQKIT_STATS
+    //
+    SEQKIT_STATS (
+        ch_cat_fastq
+    )
+    ch_versions = ch_versions.mix(SEQKIT_STATS.out.versions.first().ifEmpty(null))
+
+    //
+    // MODULE: Sub-sample reads if total read count exceeds threshold (BEFORE trimming)
+    //
+    ch_cat_fastq_subsampled = ch_cat_fastq
+    if (!params.skip_subsample) {
+        // Use SEQKIT_STATS output to determine read counts and branch
+        ch_cat_fastq
+            .join(SEQKIT_STATS.out.stats)
+            .map { meta, reads, stats ->
+                // Parse SEQKIT_STATS output to get actual read count
+                def stats_lines = stats.splitText().toList()
+                def num_reads = stats_lines[1].split('\t')[3].toLong()
+                return [ meta, reads, num_reads ]
+            }
+            .branch { meta, reads, num_reads ->
+                subsample: num_reads > params.subsample_reads_threshold
+                    def fraction = params.subsample_reads_threshold / num_reads.toDouble()
+                    return [ meta, reads, fraction ]
+                passthrough: true
+                    return [ meta, reads ]
+            }
+            .set { ch_reads_to_subsample }
+
+        SEQTK_SAMPLE ( ch_reads_to_subsample.subsample )
+        ch_versions = ch_versions.mix(SEQTK_SAMPLE.out.versions.first().ifEmpty(null))
+
+        // Mix subsampled reads with those that did not need subsampling
+        SEQTK_SAMPLE.out.reads
+            .mix(ch_reads_to_subsample.passthrough)
+            .set { ch_cat_fastq_subsampled }
+    }
+
+    //
     // SUBWORKFLOW: Read QC, extract UMI and trim adapters with TrimGalore!
     //
     ch_filtered_reads      = Channel.empty()
@@ -255,7 +296,7 @@ workflow RNASEQ {
     ch_trim_read_count     = Channel.empty()
     if (params.trimmer == 'trimgalore') {
         FASTQ_FASTQC_UMITOOLS_TRIMGALORE (
-            ch_cat_fastq,
+            ch_cat_fastq_subsampled,
             params.skip_fastqc || params.skip_qc,
             params.with_umi,
             params.skip_umi_extract,
@@ -276,7 +317,7 @@ workflow RNASEQ {
     //
     if (params.trimmer == 'fastp') {
         FASTQ_FASTQC_UMITOOLS_FASTP (
-            ch_cat_fastq,
+            ch_cat_fastq_subsampled,
             params.skip_fastqc || params.skip_qc,
             params.with_umi,
             params.skip_umi_extract,
@@ -314,36 +355,6 @@ workflow RNASEQ {
                 WorkflowRnaseq.multiqcTsvFromList(tsv_data, header)
         }
         .set { ch_fail_trimming_multiqc }
-
-    //
-    // MODULE: Sub-sample reads if total read count exceeds threshold
-    //
-    if (!params.skip_subsample) {
-        // Use the trim_read_count channel (emitted by both TrimGalore and fastp
-        // subworkflows) to decide which samples need sub-sampling.
-        // Join the read count back to the reads channel so we can branch.
-        // IMPORTANT: Pass a fractional sample_size (threshold / read_count) so
-        // that seqtk uses streaming mode and does NOT load all reads into memory.
-        ch_filtered_reads
-            .join(ch_trim_read_count)
-            .branch {
-                meta, reads, num_reads ->
-                    subsample: num_reads.toLong() > params.subsample_reads_threshold
-                        def fraction = params.subsample_reads_threshold / num_reads.toDouble()
-                        return [ meta, reads, fraction ]
-                    passthrough: true
-                        return [ meta, reads ]
-            }
-            .set { ch_reads_to_subsample }
-
-        SEQTK_SAMPLE ( ch_reads_to_subsample.subsample )
-        ch_versions = ch_versions.mix(SEQTK_SAMPLE.out.versions.first())
-
-        // Mix subsampled reads with those that did not need subsampling
-        SEQTK_SAMPLE.out.reads
-            .mix(ch_reads_to_subsample.passthrough)
-            .set { ch_filtered_reads }
-    }
 
     //
     // MODULE: Remove genome contaminant reads
@@ -919,6 +930,7 @@ workflow RNASEQ {
             ch_fail_mapping_multiqc.collectFile(name: 'fail_mapped_samples_mqc.tsv').ifEmpty([]),
             ch_fail_strand_multiqc.collectFile(name: 'fail_strand_check_mqc.tsv').ifEmpty([]),
             ch_fastqc_raw_multiqc.collect{it[1]}.ifEmpty([]),
+            SEQKIT_STATS.out.stats.collect{it[1]}.ifEmpty([]),
             ch_fastqc_trim_multiqc.collect{it[1]}.ifEmpty([]),
             ch_trim_log_multiqc.collect{it[1]}.ifEmpty([]),
             ch_sortmerna_multiqc.collect{it[1]}.ifEmpty([]),

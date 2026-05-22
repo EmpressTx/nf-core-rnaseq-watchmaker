@@ -17,6 +17,7 @@ process MULTIQC {
     path fail_mapping_summary
     path fail_strand_check
     path ('fastqc/raw/*')
+    path ('seqkit/*')  
     path ('fastqc/trim/*')
     path ('trim_log/*')
     path ('sortmerna/*')
