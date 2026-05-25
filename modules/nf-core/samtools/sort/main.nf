@@ -10,7 +10,7 @@ process SAMTOOLS_SORT {
     input:
     tuple val(meta), path(bam)
 
-    def prefix = task.ext.prefix ?: "${meta.id}.sorted"
+    def prefix = "${meta.id}.sorted"
 
     output:
     tuple val(meta), path("${prefix}.bam"), emit: bam
