@@ -265,7 +265,17 @@ workflow RNASEQ {
             .map { meta, reads, stats ->
                 // Parse SEQKIT_STATS output to get actual read count
                 def stats_lines = stats.splitText().toList()
-                def num_reads = stats_lines[1].split('\t')[3].toLong()
+                
+                def read_counts = stats_lines
+                    .drop(1)
+                    .collect { line ->
+                        def cols = line.tokenize('\t')
+                        (cols.size() > 3 && cols[3].isLong()) ? cols[3] as Long : null
+                    }
+                    .findAll { it != null }
+                
+                def num_reads = read_counts ? read_counts.sum() : 0L
+
                 return [ meta, reads, num_reads ]
             }
             .branch { meta, reads, num_reads ->
