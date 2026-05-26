@@ -97,7 +97,21 @@ workflow FASTQ_FASTQC_UMITOOLS_TRIMGALORE {
 
         ch_num_trimmed_reads
             .filter { meta, reads, num_reads -> num_reads >= min_trimmed_reads.toFloat() }
-            .map { meta, reads, num_reads -> [ meta, reads ] }
+            .map { meta, reads, num_reads ->
+                if (!meta.single_end) {
+                    def r1 = reads.find { it.name.endsWith("_val_1.fq.gz") }
+                    def r2 = reads.find { it.name.endsWith("_val_2.fq.gz") }
+        
+                    println "DEBUG TRIM PAIR → ${meta.id}: ${r1?.name} | ${r2?.name}"
+        
+                    if (!r1 || !r2) {
+                        error "Invalid pairing after trimming: ${reads*.name}"
+                    }
+        
+                    return [ meta, [r1, r2] ]
+                }
+                return [ meta, reads ]
+            }
             .set { trim_reads }
 
         ch_num_trimmed_reads
