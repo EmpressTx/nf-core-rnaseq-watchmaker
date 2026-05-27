@@ -560,7 +560,7 @@ workflow RNASEQ {
         )
         ch_versions = ch_versions.mix(QUANTIFY_STAR_SALMON.out.versions)
 
-        if (!params.skip_qc & !params.skip_deseq2_qc) {
+        if (!params.skip_qc && !params.skip_deseq2_qc) {
             DESEQ2_QC_STAR_SALMON (
                 QUANTIFY_STAR_SALMON.out.counts_gene_length_scaled,
                 ch_pca_header_multiqc,
@@ -594,7 +594,7 @@ workflow RNASEQ {
         }
         ch_versions = ch_versions.mix(QUANTIFY_RSEM.out.versions)
 
-        if (!params.skip_qc & !params.skip_deseq2_qc) {
+        if (!params.skip_qc && !params.skip_deseq2_qc) {
             DESEQ2_QC_RSEM (
                 QUANTIFY_RSEM.out.merged_counts_gene,
                 ch_pca_header_multiqc,
@@ -900,7 +900,7 @@ workflow RNASEQ {
         ch_counts_gene_length_scaled = QUANTIFY_PSEUDO_ALIGNMENT.out.counts_gene_length_scaled
         ch_versions = ch_versions.mix(QUANTIFY_PSEUDO_ALIGNMENT.out.versions)
 
-        if (!params.skip_qc & !params.skip_deseq2_qc) {
+        if (!params.skip_qc && !params.skip_deseq2_qc) {
             DESEQ2_QC_PSEUDO (
                 ch_counts_gene_length_scaled,
                 ch_pca_header_multiqc,

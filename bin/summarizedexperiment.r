@@ -7,7 +7,7 @@ library(SummarizedExperiment)
 ## Create SummarizedExperiment (se) object from counts
 
 args <- commandArgs(trailingOnly = TRUE)
-if (length(args) < 3) {
+if (length(args) < 4) {
     stop("Usage: summarizedexperiment.r <coldata> <counts> <tpm> <tx2gene>", call. = FALSE)
 }
 
@@ -19,6 +19,7 @@ tx2gene <- args[4]
 info <- file.info(tx2gene)
 if (info$size == 0) {
     tx2gene <- NULL
+    rowdata <- data.frame(tx=character(), gene_id=character(), gene_name=character()) # Initialize empty rowdata to avoid errors when tx2gene is empty
 } else {
     rowdata <- read.csv(tx2gene, sep = "\t", header = FALSE)
     colnames(rowdata) <- c("tx", "gene_id", "gene_name")
@@ -40,7 +41,7 @@ if (length(intersect(rownames(counts), rowdata[["tx"]])) > length(intersect(rown
 if (file.exists(coldata)) {
     coldata <- read.csv(coldata, sep = "\t")
     coldata <- coldata[match(colnames(counts), coldata[, 1]), ]
-    coldata <- cbind(files = fns, coldata)
+    coldata <- cbind(files = colnames(counts), coldata) #Use column names from counts as file/sample identifiers (previously used undefined variable 'fns')
 } else {
     message("ColData not avaliable ", coldata)
     coldata <- data.frame(files = colnames(counts), names = colnames(counts))

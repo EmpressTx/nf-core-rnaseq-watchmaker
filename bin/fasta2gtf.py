@@ -26,7 +26,8 @@ def fasta_iter(fasta_name):
     with open(fasta_name) as fh:
         # ditch the boolean (x[0]) and just keep the header or sequence since
         # we know they alternate.
-        faiter = (x[1] for x in groupby(fh, lambda line: line[0] == ">"))
+        # Switched from line[0] == ">" to startswith(">") to safely handle empty lines in FASTA input
+        faiter = (x[1] for x in groupby(fh, lambda line: line.startswith(">")))
         for header in faiter:
             # drop the ">"
             headerStr = header.__next__()[1:].strip()

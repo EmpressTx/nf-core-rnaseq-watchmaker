@@ -31,8 +31,6 @@ process MULTIQC {
     path ('picard/markduplicates/*')
     path ('featurecounts/*')
     path ('deseq2/aligner/*')
-    path ('deseq2/aligner/*')
-    path ('deseq2/pseudoaligner/*')
     path ('deseq2/pseudoaligner/*')
     path ('preseq/*')
     path ('qualimap/*')

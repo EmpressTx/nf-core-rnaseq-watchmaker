@@ -23,6 +23,7 @@ library(DESeq2)
 library(ggplot2)
 library(RColorBrewer)
 library(pheatmap)
+library(matrixStats) # Added to explicitly provide rowVars() (avoids relying on indirect/package-loaded dependency)
 
 ################################################
 ################################################

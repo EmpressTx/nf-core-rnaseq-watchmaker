@@ -10,7 +10,7 @@ library(tximport)
 
 # Parsing command line arguments
 args <- commandArgs(trailingOnly=TRUE)
-if (length(args) < 4) {
+if (length(args) < 5) {
     stop("Usage: tximport.r <coldata_path> <path> <prefix> <quant_type> <tx2gene_path>",
         call.=FALSE)
 }
@@ -80,7 +80,7 @@ create_summarized_experiment <- function(counts, abundance, length, col_data, ro
 
 # Define pattern for file names based on quantification type
 pattern <- ifelse(quant_type == "kallisto", "abundance.tsv", "quant.sf")
-fns <- list.files(path, pattern = pattern, recursive = T, full.names = T)
+fns <- list.files(path, pattern = pattern, recursive = TRUE, full.names = TRUE)
 names <- basename(dirname(fns))
 names(fns) <- names
 dropInfReps <- quant_type == "kallisto"
