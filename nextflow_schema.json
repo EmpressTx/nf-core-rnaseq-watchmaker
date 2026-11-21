@@ -654,8 +654,7 @@
                 "skip_subsample": {
                     "type": "boolean",
                     "description": "Skip sub-sampling of reads with seqtk sample.",
-                    "fa_icon": "fas fa-fast-forward",
-                    "default": true
+                    "fa_icon": "fas fa-fast-forward"
                 }
             }
         },
